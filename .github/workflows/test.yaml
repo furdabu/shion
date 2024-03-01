@@ -1,0 +1,70 @@
+name: 自動テスト
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  assign-pr-author-as-assignee:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Assign Author as Assignee"
+        uses: itsOliverBott/assign-pr-author-as-assignee@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  ESLint:
+    name: ユニットテスト (ESLint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx
+
+  StyleLint:
+    name: ユニットテスト (StyleLint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Stylelint
+        run: stylelint 'src/**/*.{css,scss,sass}'
+
+  buildTest:
+    name: ビルドテスト (Next Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js app
+        run: npm run build
